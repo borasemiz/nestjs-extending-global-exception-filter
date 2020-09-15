@@ -1,0 +1,51 @@
+import { Injectable, Scope, Logger as NestLogger, Inject, UseInterceptors } from '@nestjs/common';
+import { REQUEST } from '@nestjs/core';
+import { Request } from 'express';
+import { utilities as nestWinstonModuleUtilities } from 'nest-winston';
+import { transports, createLogger, format, Logger as WinstonLogger } from 'winston';
+import { HeadersInterceptor } from '../api/headers.interceptor';
+import { stderr, stdout } from 'process';
+const { combine, timestamp } = format;
+
+@Injectable({ scope: Scope.TRANSIENT })
+@UseInterceptors(HeadersInterceptor)
+export class LoggerService extends NestLogger {
+    winstonLogger: WinstonLogger;
+    constructor(@Inject(REQUEST) private readonly request: Request) {
+        super();
+        const headers = this.request && this.request.headers;
+        const logFormat = combine(timestamp(), nestWinstonModuleUtilities.format.nestLike());
+        this.winstonLogger = createLogger({
+            level: 'info',
+            defaultMeta: { headers },
+            transports: [
+                new transports.Stream({
+                    format: logFormat,
+                    stream: stderr,
+                    level: 'error'
+                }),
+                new transports.Stream({
+                    format: logFormat,
+                    stream: stdout,
+                    level: 'info'
+                })
+            ]
+        });
+    }
+
+    log(message: string) {
+
+    }
+    error(message: string, trace: string) {
+        this.winstonLogger.error(message);
+    }
+    warn(message: string) {
+        this.winstonLogger.warn(message);
+    }
+    debug(message: string) {
+        this.winstonLogger.debug(message);
+    }
+    verbose(message: string) {
+        this.winstonLogger.info(message);
+    }
+}
