@@ -15,7 +15,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: new StatusLoggerService()
   });
-  app.useGlobalFilters(new MaExceptionFilter());
+  //app.useGlobalFilters(new MaExceptionFilter());
   await app.listen(3000);
 }
 bootstrap();
