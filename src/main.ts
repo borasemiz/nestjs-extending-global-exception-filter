@@ -1,11 +1,10 @@
 import { ArgumentsHost, Catch } from '@nestjs/common';
-import { NestFactory, BaseExceptionFilter as F } from '@nestjs/core';
+import { NestFactory, BaseExceptionFilter } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { BaseExceptionFilter } from './exception.filter';
 import { StatusLoggerService } from './logger/status-logger.service';
 
 @Catch()
-class MaExceptionFilter extends F {
+class MaExceptionFilter extends BaseExceptionFilter {
   catch(exception: any, host: ArgumentsHost) {
     super.catch(exception, host);
   }
